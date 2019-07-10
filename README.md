@@ -1,7 +1,8 @@
 # Weather-API
 - kotlin
 - rx
-- Android Jetpack
+- android jetpack
+- retrofit
 
 Usar https://openweathermap.org/api para hacer el diseño sigt.
 
