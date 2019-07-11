@@ -53,10 +53,16 @@ class TimeWeatherFragment : Fragment() {
         viewModel.timeWeather.observe(this, Observer {
             Toast.makeText(context, "Updated", Toast.LENGTH_SHORT).show()
             if (it != null) {
-                textViewCity!!.text = it.name
+                textViewCity!!.text = if (it.name == "La Luisa") {
+                    "La Lisa"
+                } else {
+                    it.name
+                }
                 textViewTemperature!!.text = (it.main.temp).toInt().toString() + resources.getString(R.string.gradosC)
-                textViewLowTemperature!!.text = it.main.temp_min.toInt().toString() + resources.getString(R.string.gradosC)
-                textViewHighTemperature!!.text = it.main.temp_max.toInt().toString() + resources.getString(R.string.gradosC)
+                textViewLowTemperature!!.text =
+                    it.main.temp_min.toInt().toString() + resources.getString(R.string.gradosC)
+                textViewHighTemperature!!.text =
+                    it.main.temp_max.toInt().toString() + resources.getString(R.string.gradosC)
                 textViewDescription!!.text = it.weather[0].description.toUpperCase()
             } else {
                 textViewCity!!.text = "- - -"
