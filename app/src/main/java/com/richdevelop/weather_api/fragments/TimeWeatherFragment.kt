@@ -51,7 +51,7 @@ class TimeWeatherFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         viewModel.timeWeather.observe(this, Observer {
-            Toast.makeText(context, "Updated", Toast.LENGTH_SHORT).show()
+            //Toast.makeText(context, "Updated", Toast.LENGTH_SHORT).show()
             if (it != null) {
                 textViewCity!!.text = if (it.name == "La Luisa") {
                     "La Lisa"
