@@ -4,4 +4,5 @@
     <string name="high">High</string>
     <string name="gradosF">°F</string>
     <string name="gradosC">°C</string>
+    <string name="grados">°</string>
 </resources>

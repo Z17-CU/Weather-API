@@ -60,9 +60,9 @@ class TimeWeatherFragment : Fragment() {
                 }
                 textViewTemperature!!.text = (it.main.temp).toInt().toString() + resources.getString(R.string.gradosC)
                 textViewLowTemperature!!.text =
-                    it.main.temp_min.toInt().toString() + resources.getString(R.string.gradosC)
+                    it.main.temp_min.toInt().toString() + resources.getString(R.string.grados)
                 textViewHighTemperature!!.text =
-                    it.main.temp_max.toInt().toString() + resources.getString(R.string.gradosC)
+                    it.main.temp_max.toInt().toString() + resources.getString(R.string.grados)
                 textViewDescription!!.text = it.weather[0].description.toUpperCase()
             } else {
                 textViewCity!!.text = "- - -"
