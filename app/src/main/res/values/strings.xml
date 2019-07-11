@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Weather-API</string>
+    <string name="low">Low</string>
+    <string name="high">High</string>
+    <string name="gradosF">°F</string>
+    <string name="gradosC">°C</string>
+</resources>

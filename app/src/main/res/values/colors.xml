@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#fab536</color>
+    <color name="colorPrimaryDark">#fab536</color>
+    <color name="colorAccent">#fab536</color>
+
+    <color name="backgroundColor">#FFFFFF</color>
+    <color name="separatorsColor">#eaedf1</color>
+    <color name="textColor">#3d5c7b</color>
+    <color name="textUnselectedColor">#9dadbc</color>
+</resources>
