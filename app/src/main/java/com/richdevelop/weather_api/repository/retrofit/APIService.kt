@@ -1,6 +1,7 @@
 package com.richdevelop.weather_api.repository.retrofit
 
 import com.richdevelop.weather_api.repository.room.entitys.TimeWeather
+import com.richdevelop.weather_api.utils.Const.Companion.BASE_URL
 import retrofit2.Call
 import retrofit2.http.*
 
@@ -10,7 +11,6 @@ interface APIService {
     fun getTimeWeather(@Url url: String): Call<TimeWeather>
 
     companion object {
-        private const val BASE_URL = "http://api.openweathermap.org"
         val apiService: APIService
             get() = RetrofitClient.getClient(BASE_URL)!!.create(APIService::class.java)
     }

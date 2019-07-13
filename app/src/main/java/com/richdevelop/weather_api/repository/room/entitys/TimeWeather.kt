@@ -2,8 +2,6 @@ package com.richdevelop.weather_api.repository.room.entitys
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import androidx.room.TypeConverters
-import com.richdevelop.weather_api.repository.room.converters.Converter
 
 @Entity
 data class TimeWeather(
@@ -21,8 +19,8 @@ data class TimeWeather(
     val visibility: Int,
     val weather: List<Weather>,
     val wind: Wind
-){
-    companion object{
+) {
+    companion object {
         const val TABLE_NAME = "TimeWeather"
     }
 }

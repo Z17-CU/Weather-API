@@ -1,7 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Weather-API</string>
-    <string name="high">Alta</string>
-    <string name="low">Baja</string>
+    <string name="high" translatable="false">High</string>
+    <string name="low" translatable="false">Low</string>
     <string name="gradosF">°F</string>
     <string name="gradosC">°C</string>
     <string name="grados">°</string>

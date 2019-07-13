@@ -14,7 +14,8 @@ import java.util.*
 
 internal class LocationListener(val context: Context, val dao: Dao, val apiService: APIService) : LocationListener {
 
-    val url = "/data/2.5/weather?APPID=aaff1a7a058627a71698a204d3fa78b7&units=metric"
+    private val url =
+        "/data/2.5/weather?APPID=aaff1a7a058627a71698a204d3fa78b7&units=metric&lang=" + Locale.getDefault().language
 
     override fun onLocationChanged(loc: Location) {
 
