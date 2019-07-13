@@ -1,18 +1,17 @@
 package com.richdevelop.weather_api.locationListener
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.location.Location
 import android.location.LocationListener
 import android.os.AsyncTask
 import android.os.Bundle
-import com.richdevelop.weather_api.repository.retrofit.APIService
+import com.richdevelop.weather_api.repository.retrofit.APIService.Companion.apiServiceWather
 import com.richdevelop.weather_api.repository.room.Dao
 import com.richdevelop.weather_api.repository.room.entitys.TimeWeather
-import retrofit2.Response
 import java.util.*
 
-internal class LocationListener(val context: Context, val dao: Dao, val apiService: APIService) : LocationListener {
+
+internal class LocationListener(val dao: Dao) : LocationListener {
 
     private val url =
         "/data/2.5/weather?APPID=aaff1a7a058627a71698a204d3fa78b7&units=metric&lang=" + Locale.getDefault().language
@@ -26,10 +25,10 @@ internal class LocationListener(val context: Context, val dao: Dao, val apiServi
         object : AsyncTask<Void, Void, Void?>() {
             override fun doInBackground(vararg voids: Void?): Void? {
 
-                val response: Response<TimeWeather>?
+                val response: TimeWeather
                 try {
-                    response = apiService.getTimeWeather(tempUrl).execute()
-                    dao.insertTimeWeather(response.body()!!)
+                    response = apiServiceWather.getTimeWeather(tempUrl).execute().body()!!
+                    dao.insertTimeWeather(response)
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }

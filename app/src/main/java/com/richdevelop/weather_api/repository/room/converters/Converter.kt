@@ -1,7 +1,6 @@
 package com.richdevelop.weather_api.repository.room.converters
 
 import androidx.room.TypeConverter
-import com.bumptech.glide.RequestBuilder
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.richdevelop.weather_api.repository.room.entitys.*
@@ -101,21 +100,6 @@ class Converter {
 
     @TypeConverter
     fun windToString(someObjects: Wind): String {
-        return gson.toJson(someObjects)
-    }
-
-    @TypeConverter
-    fun stringToReqBuild(data: String?): RequestBuilder<*>? {
-        if (data == null) {
-            return null
-        }
-        val listType = object : TypeToken<RequestBuilder<*>>() {}.type
-
-        return gson.fromJson(data, listType)
-    }
-
-    @TypeConverter
-    fun ReqBuildToString(someObjects: RequestBuilder<*>): String {
         return gson.toJson(someObjects)
     }
 }

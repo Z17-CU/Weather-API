@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.richdevelop.weather_api.repository.TimeWeatherRepository
-import com.richdevelop.weather_api.repository.retrofit.APIService
 import com.richdevelop.weather_api.repository.room.AppDataBase
 
 class TimeWeatherViewModelFactory(private val context: Context) :
@@ -13,7 +12,6 @@ class TimeWeatherViewModelFactory(private val context: Context) :
 
         return TimeWeatherViewModel(
             TimeWeatherRepository(
-                APIService.apiService,
                 AppDataBase.instance(context).dao(),
                 context
             )

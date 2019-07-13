@@ -34,6 +34,7 @@ class TimeWeatherFragment : Fragment() {
     var glideOptions: RequestOptions? = null
     var lastImage: String? = null
 
+
     @SuppressLint("MissingPermission")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -65,7 +66,6 @@ class TimeWeatherFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         viewModel.timeWeather.observe(this, Observer {
-            //Toast.makeText(context, "Updated", Toast.LENGTH_SHORT).show()
             if (it != null) {
                 textViewCity!!.text = if (it.name == "La Luisa") {
                     "La Lisa"

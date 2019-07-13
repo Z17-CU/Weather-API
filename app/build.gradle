@@ -13,7 +13,7 @@ android {
         applicationId "com.richdevelop.weather_api"
         minSdkVersion 19
         targetSdkVersion 29
-        versionCode 4
+        versionCode 5
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -39,7 +39,7 @@ dependencies {
     androidTestImplementation 'androidx.test:runner:1.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
-    // ViewModel and LiveData
+    /** ViewModel and LiveData */
     implementation 'androidx.core:core-ktx:1.0.2'
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0-alpha02'
     implementation 'androidx.lifecycle:lifecycle-viewmodel:2.2.0-alpha02'
@@ -64,16 +64,16 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.1.0-rc01'
 
 
-    /*room*/
+    /**room*/
     def room_version = "1.1.1"
 
     implementation "android.arch.persistence.room:runtime:$room_version"
     kapt "android.arch.persistence.room:compiler:$room_version"
 
-    //gson
+    /**gson*/
     implementation 'com.google.code.gson:gson:2.8.5'
 
-    //retrofit
+    /**retrofit*/
     implementation 'com.squareup.okhttp3:okhttp:3.10.0'
     implementation 'com.squareup.retrofit2:retrofit:2.4.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.4.0'
@@ -81,7 +81,7 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-extensions:2.0.0'
     implementation 'com.squareup.retrofit2:converter-scalars:2.1.0'
 
-    //Dagger
+    /**Dagger*/
     implementation 'com.google.dagger:dagger-android:2.21'
     implementation 'com.google.dagger:dagger-android-support:2.21'
 

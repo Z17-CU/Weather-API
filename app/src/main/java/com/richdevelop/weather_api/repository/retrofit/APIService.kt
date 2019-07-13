@@ -11,7 +11,8 @@ interface APIService {
     fun getTimeWeather(@Url url: String): Call<TimeWeather>
 
     companion object {
-        val apiService: APIService
-            get() = RetrofitClient.getClient(BASE_URL)!!.create(APIService::class.java)
+        val apiServiceWather: APIService
+            get() = RetrofitClient.get(BASE_URL)!!.create(APIService::class.java)
+
     }
 }
