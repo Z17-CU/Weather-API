@@ -107,16 +107,29 @@
                     android:orientation="vertical"
                     android:gravity="center">
 
-                <TextView
-                        android:id="@+id/_textViewDescription"
+                <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:textSize="24sp"
-                        android:maxLines="1"
-                        android:textStyle="bold"
-                        android:textColor="@color/textColor"
-                        tools:text="HOT AND SUNNY"/>
+                        android:orientation="horizontal"
+                        android:gravity="center">
+
+                    <TextView
+                            android:id="@+id/_textViewDescription"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:textSize="24sp"
+                            android:maxLines="1"
+                            android:textStyle="bold"
+                            android:textColor="@color/textColor"
+                            tools:text="HOT AND SUNNY"/>
+
+                    <ImageView
+                            android:id="@+id/_imageViewWeather"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+
+                </LinearLayout>
 
                 <LinearLayout
                         android:layout_width="match_parent"
