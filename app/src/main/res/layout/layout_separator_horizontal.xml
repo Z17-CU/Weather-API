@@ -11,7 +11,7 @@
     <LinearLayout
             android:layout_weight="0.5"
             android:layout_width="0dp"
-            android:background="@drawable/separator_bg"
+            android:background="?separator_color"
             android:layout_height="match_parent"/>
 
     <LinearLayout

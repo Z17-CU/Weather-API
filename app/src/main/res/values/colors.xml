@@ -4,8 +4,13 @@
     <color name="colorPrimaryDark">#fab536</color>
     <color name="colorAccent">#fab536</color>
 
+    <color name="darkColorPrimary">#000000</color>
+    <color name="darkColorPrimaryDark">#000000</color>
+    <color name="darkColorAccent">#000000</color>
+
     <color name="backgroundColor">#FFFFFF</color>
     <color name="separatorsColor">#eaedf1</color>
+    <color name="darkSeparatorsColor">#242424</color>
     <color name="textColor">#3d5c7b</color>
     <color name="textUnselectedColor">#9dadbc</color>
 </resources>

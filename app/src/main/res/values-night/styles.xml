@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/darkColorPrimary</item>
+        <item name="colorPrimaryDark">@color/darkColorPrimaryDark</item>
+        <item name="colorAccent">@color/darkColorAccent</item>
+
+        <item name="background_color">#000</item>
+        <item name="text_color">?colorOnSurface</item>
+        <item name="separator_color">@color/darkSeparatorsColor</item>
+    </style>
+
+</resources>

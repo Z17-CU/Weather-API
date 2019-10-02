@@ -7,7 +7,7 @@
 
     <LinearLayout
             android:layout_weight="1"
-            android:background="@drawable/separator_bg"
+            android:background="?separator_color"
             android:layout_width="4dp"
             android:layout_height="0dp"/>
 

@@ -16,6 +16,7 @@ android {
         versionCode 5
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -38,6 +39,12 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+
+    /** Multidex */
+    implementation 'com.android.support:multidex:1.0.3'
+
+    /** Dark theme */
+    implementation 'com.google.android.material:material:1.1.0-alpha10'
 
     /** ViewModel and LiveData */
     implementation 'androidx.core:core-ktx:1.0.2'

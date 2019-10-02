@@ -4,7 +4,7 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               tools:context=".MainActivity"
-              android:background="@drawable/yellow_bg"
+              android:background="?background_color"
               android:padding="24dp"
               android:id="@+id/fragment_main">
 
@@ -12,7 +12,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:background="@drawable/white_bg">
+            android:background="?colorSurface">
 
         <LinearLayout
                 android:layout_weight="1"
@@ -69,7 +69,7 @@
                         android:id="@+id/_textViewCity"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textColor="@color/textColor"
+                        android:textColor="?text_color"
                         android:gravity="center"
                         android:textSize="38sp"
                         android:maxLines="1"
@@ -80,7 +80,7 @@
                         android:id="@+id/_textViewTemperature"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textColor="@color/textColor"
+                        android:textColor="?text_color"
                         android:gravity="center"
                         android:textSize="130sp"
                         android:maxLines="1"
@@ -113,7 +113,7 @@
                         android:textSize="24sp"
                         android:maxLines="1"
                         android:textStyle="bold"
-                        android:textColor="@color/textColor"
+                        android:textColor="?text_color"
                         tools:text="HOT AND SUNNY"/>
 
                 <ImageView
@@ -139,7 +139,7 @@
                             android:id="@+id/_textViewLowTemperature"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textColor="@color/textColor"
+                            android:textColor="?text_color"
                             android:gravity="center"
                             android:textSize="42sp"
                             android:maxLines="1"
@@ -148,7 +148,7 @@
                     <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textColor="@color/textColor"
+                            android:textColor="?text_color"
                             android:gravity="center"
                             android:textSize="42sp"
                             android:maxLines="1"
@@ -170,7 +170,7 @@
                             android:id="@+id/_textViewHighTemperature"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textColor="@color/textColor"
+                            android:textColor="?text_color"
                             android:gravity="center"
                             android:textSize="42sp"
                             android:maxLines="1"
@@ -179,7 +179,7 @@
                     <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textColor="@color/textColor"
+                            android:textColor="?text_color"
                             android:gravity="center"
                             android:textSize="42sp"
                             android:maxLines="1"
