@@ -19,6 +19,7 @@ import com.richdevelop.weather_api.utils.Const.Companion.IMAGE_URL
 import com.richdevelop.weather_api.utils.Const.Companion.IMAGE_URL_END
 import com.richdevelop.weather_api.viewModel.TimeWeatherViewModel
 import com.richdevelop.weather_api.viewModel.TimeWeatherViewModelFactory
+import kotlinx.android.synthetic.main.fragment_main.*
 
 
 class TimeWeatherFragment : Fragment() {
@@ -42,12 +43,12 @@ class TimeWeatherFragment : Fragment() {
     ): View {
         val view = inflater.inflate(R.layout.fragment_main, container, false)
 
-        textViewCity = view.findViewById<TextView>(R.id._textViewCity)
-        textViewTemperature = view.findViewById<TextView>(R.id._textViewTemperature)
-        textViewLowTemperature = view.findViewById<TextView>(R.id._textViewLowTemperature)
-        textViewHighTemperature = view.findViewById<TextView>(R.id._textViewHighTemperature)
-        textViewDescription = view.findViewById<TextView>(R.id._textViewDescription)
-        imageViewWeather = view.findViewById<ImageView>(R.id._imageViewWeather)
+        textViewCity = view.findViewById(R.id._textViewCity)
+        textViewTemperature = view.findViewById(R.id._textViewTemperature)
+        textViewLowTemperature = view.findViewById(R.id._textViewLowTemperature)
+        textViewHighTemperature = view.findViewById(R.id._textViewHighTemperature)
+        textViewDescription = view.findViewById(R.id._textViewDescription)
+        imageViewWeather = view.findViewById(R.id._imageViewWeather)
 
         glideOptions = RequestOptions()
             .centerCrop()
@@ -72,7 +73,8 @@ class TimeWeatherFragment : Fragment() {
                 } else {
                     it.name
                 }
-                textViewTemperature!!.text = (it.main.temp).toInt().toString() + resources.getString(R.string.gradosC)
+                textViewTemperature!!.text =
+                    (it.main.temp).toInt().toString() + resources.getString(R.string.gradosC)
                 textViewLowTemperature!!.text =
                     it.main.temp_min.toInt().toString() + resources.getString(R.string.grados)
                 textViewHighTemperature!!.text =
@@ -92,6 +94,7 @@ class TimeWeatherFragment : Fragment() {
                 imageViewWeather!!.setImageBitmap(null)
             }
         })
+        onClicks()
     }
 
     private fun loadImage(iconName: String) {
@@ -120,5 +123,18 @@ class TimeWeatherFragment : Fragment() {
             }
         }
         execute.execute()
+    }
+
+    private fun onClicks() {
+        _locationImageView.setOnClickListener {
+            replaceFragment(MapFragment())
+        }
+    }
+
+    private fun replaceFragment(fragment: Fragment) {
+        parentFragmentManager
+            .beginTransaction()
+            .replace(R.id.layout_main, fragment)
+            .commit()
     }
 }

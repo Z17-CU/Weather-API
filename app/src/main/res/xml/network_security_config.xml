@@ -2,5 +2,7 @@
 <network-security-config>
     <domain-config cleartextTrafficPermitted="true">
         <domain includeSubdomains="true">openweathermap.org</domain>
+        <domain includeSubdomains="true">redcuba.cu</domain>
+        <domain includeSubdomains="true">openstreetmap.org</domain>
     </domain-config>
 </network-security-config>
