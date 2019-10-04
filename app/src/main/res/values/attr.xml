@@ -6,5 +6,6 @@
     <attr name="separator_color" format="reference|color" />
 
     <attr name="bg_location_color" format="reference|color" />
+    <attr name="colorAccent" format="reference|color" />
 
 </resources>

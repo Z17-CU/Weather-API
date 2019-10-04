@@ -93,7 +93,7 @@
                     android:layout_height="wrap_content"
                     android:maxLines="1"
                     android:textColor="?colorOnSurface"
-                    tools:text="(54125485 - 45468451)" />
+                    android:text="@string/loading" />
 
         </LinearLayout>
 

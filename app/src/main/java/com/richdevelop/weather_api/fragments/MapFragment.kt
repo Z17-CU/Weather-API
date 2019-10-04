@@ -51,6 +51,7 @@ class MapFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
 
+        activity?.window?.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
         Configuration.getInstance()
             .load(context, PreferenceManager.getDefaultSharedPreferences(context))
         val view = inflater.inflate(R.layout.layout_map, container, false)
@@ -76,6 +77,7 @@ class MapFragment : Fragment() {
         fabLocation.setOnClickListener {
             if (lastLocation != null) {
                 centerMap(lastLocation!!)
+                autoCenter = true
             }
         }
 
@@ -109,6 +111,7 @@ class MapFragment : Fragment() {
         layoutStaticLocation = view.findViewById(R.id._layoutStaticLocation)
         layoutStaticLocation.setOnClickListener {
 
+
             /** Aqui return location */
 
             context?.let {
@@ -131,12 +134,19 @@ class MapFragment : Fragment() {
                             response.coord.lat = mapView.mapCenter.latitude
                             response.coord.lon = mapView.mapCenter.longitude
                             AppDataBase.getInstance(context!!).dao().insertTimeWeather(response)
-                            replaceFragment(TimeWeatherFragment())
+
                         } catch (e: Exception) {
                             e.printStackTrace()
                         }
 
                         return null
+                    }
+
+                    override fun onPostExecute(result: Void?) {
+                        super.onPostExecute(result)
+                        /** Exit */
+                        cleanFullScreen()
+                        replaceFragment(TimeWeatherFragment())
                     }
                 }
                 execute.execute()
@@ -205,6 +215,7 @@ class MapFragment : Fragment() {
         view.requestFocus()
         view.setOnKeyListener { _, keyCode, _ ->
             if (keyCode == KeyEvent.KEYCODE_BACK) {
+                cleanFullScreen()
                 replaceFragment(TimeWeatherFragment())
                 return@setOnKeyListener true
             }
@@ -286,6 +297,10 @@ class MapFragment : Fragment() {
         _textViewCoordenadas?.let {
             _textViewCoordenadas.text = "($text)"
         }
+    }
+
+    private fun cleanFullScreen() {
+        activity?.window?.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
     }
 
     /** Weather API */

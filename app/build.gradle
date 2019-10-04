@@ -45,7 +45,7 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
     /** Maps */
-    implementation 'org.osmdroid:osmdroid-android:6.0.0'
+    implementation 'org.osmdroid:osmdroid-android:6.1.2'
 
     /** Multidex */
     implementation 'com.android.support:multidex:1.0.3'
