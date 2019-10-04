@@ -29,6 +29,8 @@ internal class LocationListener(val dao: Dao) : LocationListener {
                 try {
                     response = apiServiceWather.getTimeWeather(tempUrl).execute().body()!!
                     response.id = 1
+                    response.coord.lat = loc.latitude
+                    response.coord.lon = loc.longitude
                     dao.insertTimeWeather(response)
                 } catch (e: Exception) {
                     e.printStackTrace()

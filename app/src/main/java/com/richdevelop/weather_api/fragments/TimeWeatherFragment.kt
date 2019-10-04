@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -15,11 +16,15 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestBuilder
 import com.bumptech.glide.request.RequestOptions
 import com.richdevelop.weather_api.R
+import com.richdevelop.weather_api.repository.retrofit.APIService
+import com.richdevelop.weather_api.repository.room.AppDataBase
+import com.richdevelop.weather_api.repository.room.entitys.TimeWeather
 import com.richdevelop.weather_api.utils.Const.Companion.IMAGE_URL
 import com.richdevelop.weather_api.utils.Const.Companion.IMAGE_URL_END
 import com.richdevelop.weather_api.viewModel.TimeWeatherViewModel
 import com.richdevelop.weather_api.viewModel.TimeWeatherViewModelFactory
 import kotlinx.android.synthetic.main.fragment_main.*
+import java.util.*
 
 
 class TimeWeatherFragment : Fragment() {
@@ -34,6 +39,9 @@ class TimeWeatherFragment : Fragment() {
     private var imageViewWeather: ImageView? = null
     var glideOptions: RequestOptions? = null
     var lastImage: String? = null
+
+    private var lastLatitude = 0.0
+    private var lastLongitude = 0.0
 
 
     @SuppressLint("MissingPermission")
@@ -85,6 +93,9 @@ class TimeWeatherFragment : Fragment() {
                     loadImage(it.weather[0].icon)
                 }
 
+                lastLatitude = it.coord.lat
+                lastLongitude = it.coord.lon
+
             } else {
                 textViewCity!!.text = "- - -"
                 textViewTemperature!!.text = "- -"
@@ -129,6 +140,14 @@ class TimeWeatherFragment : Fragment() {
         _locationImageView.setOnClickListener {
             replaceFragment(MapFragment())
         }
+
+        _refreshImageView.setOnClickListener {
+            if (lastLatitude == 0.0 && lastLongitude == 0.0) {
+                Toast.makeText(context, "Las coordenadas no están listas", Toast.LENGTH_LONG).show()
+            } else {
+                updateData()
+            }
+        }
     }
 
     private fun replaceFragment(fragment: Fragment) {
@@ -136,5 +155,34 @@ class TimeWeatherFragment : Fragment() {
             .beginTransaction()
             .replace(R.id.layout_main, fragment)
             .commit()
+    }
+
+    private fun updateData() {
+        val url =
+            "/data/2.5/weather?APPID=aaff1a7a058627a71698a204d3fa78b7&units=metric&lang=" + Locale.getDefault().language
+        val tempUrl =
+            url + ("&lat=" + lastLatitude + "&lon=" + lastLongitude)
+
+        val execute = @SuppressLint("StaticFieldLeak")
+
+        object : AsyncTask<Void, Void, Void?>() {
+            override fun doInBackground(vararg voids: Void?): Void? {
+
+                val response: TimeWeather
+                try {
+                    response =
+                        APIService.apiServiceWather.getTimeWeather(tempUrl).execute().body()!!
+                    response.id = 1
+                    response.coord.lat = lastLatitude
+                    response.coord.lon = lastLongitude
+                    AppDataBase.getInstance(context!!).dao().insertTimeWeather(response)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+
+                return null
+            }
+        }
+        execute.execute()
     }
 }

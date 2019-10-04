@@ -13,7 +13,6 @@ import android.preference.PreferenceManager
 import android.view.*
 import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.richdevelop.weather_api.R
@@ -23,7 +22,6 @@ import com.richdevelop.weather_api.repository.room.entitys.TimeWeather
 import kotlinx.android.synthetic.main.layout_map.*
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
-import org.osmdroid.tileprovider.tilesource.XYTileSource
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
@@ -57,14 +55,15 @@ class MapFragment : Fragment() {
             .load(context, PreferenceManager.getDefaultSharedPreferences(context))
         val view = inflater.inflate(R.layout.layout_map, container, false)
         mapView = view.findViewById(R.id._mapView)
-        val tileSource = XYTileSource(
-            "HOT", 1, 10, 256, ".png",
-            arrayOf(
-                "http://a.tiles.redcuba.cu/",
-                "http://b.tiles.redcuba.cu/",
-                "http://c.tiles.redcuba.cu/"
-            ), "© OpenStreetMap contributors"
-        )
+
+//        val tileSource = XYTileSource(
+//            "HOT", 1, 10, 256, ".png",
+//            arrayOf(
+//                "http://a.tiles.redcuba.cu/",
+//                "http://b.tiles.redcuba.cu/",
+//                "http://c.tiles.redcuba.cu/"
+//            ), "© OpenStreetMap contributors"
+//        )
 
         //mapView.setTileSource(tileSource)
         mapView.setTileSource(TileSourceFactory.MAPNIK)
@@ -129,6 +128,8 @@ class MapFragment : Fragment() {
                             response =
                                 APIService.apiServiceWather.getTimeWeather(tempUrl).execute().body()!!
                             response.id = 1
+                            response.coord.lat = mapView.mapCenter.latitude
+                            response.coord.lon = mapView.mapCenter.longitude
                             AppDataBase.getInstance(context!!).dao().insertTimeWeather(response)
                             replaceFragment(TimeWeatherFragment())
                         } catch (e: Exception) {
