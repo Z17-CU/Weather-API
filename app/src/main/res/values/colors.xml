@@ -14,6 +14,11 @@
     <color name="textColor">#3d5c7b</color>
     <color name="textUnselectedColor">#9dadbc</color>
 
+
+    <color name="bg_location_color_Day">#32000000</color>
+    <color name="bg_location_color_Night">#32FFFFFF</color>
+
+
     //* Location colors */
 
     <color name="staticLocationColor">#679cc1</color>
