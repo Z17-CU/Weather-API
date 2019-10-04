@@ -119,7 +119,7 @@ class MapFragment : Fragment() {
                 if (mMarker == null) {
                     mMarker = Marker(mapView)
                     mMarker!!.setInfoWindow(null)
-                    mMarker!!.setIcon(context!!.resources.getDrawable(R.drawable.ic_my_position))
+                    mMarker!!.setIcon(context?.resources?.getDrawable(R.drawable.ic_my_position))
                     mMarker!!.position =
                         GeoPoint(location.latitude, location.longitude, location.altitude)
                     mMarker!!.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
@@ -143,10 +143,10 @@ class MapFragment : Fragment() {
         }
 
         val locationManager =
-            context!!.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+            context?.getSystemService(Context.LOCATION_SERVICE) as LocationManager
         locationManager.requestLocationUpdates(
             LocationManager.GPS_PROVIDER,
-            10000,
+            1000,
             10f,
             mLocationListener
         )
@@ -185,40 +185,52 @@ class MapFragment : Fragment() {
     }
 
     private fun showFab() {
-        fabLocation.visibility = View.VISIBLE
-        fabLocation.animate()
-            .setListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animation: Animator?) {
-                    super.onAnimationEnd(animation)
-                    fabLocation.visibility = View.VISIBLE
-                }
-            })
-            .alpha(100.toFloat()).duration = 300
+        try {
+            fabLocation.visibility = View.VISIBLE
+            fabLocation.animate()
+                .setListener(object : AnimatorListenerAdapter() {
+                    override fun onAnimationEnd(animation: Animator?) {
+                        super.onAnimationEnd(animation)
+                        fabLocation.visibility = View.VISIBLE
+                    }
+                })
+                .alpha(100.toFloat()).duration = 300
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     private fun hideFab() {
-        fabLocation.animate()
-            .alpha(0.toFloat())
-            .setDuration(300)
-            .setListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animation: Animator?) {
-                    super.onAnimationEnd(animation)
-                    fabLocation.visibility = View.GONE
-                }
-            })
+        try {
+            fabLocation.animate()
+                .alpha(0.toFloat())
+                .setDuration(300)
+                .setListener(object : AnimatorListenerAdapter() {
+                    override fun onAnimationEnd(animation: Animator?) {
+                        super.onAnimationEnd(animation)
+                        fabLocation.visibility = View.GONE
+                    }
+                })
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     @SuppressLint("SetTextI18n")
     fun updateTextViewCoordinates(latitude: Double, longitude: Double) {
-        _textViewCoordenadas.text =
-            "(${String.format("%.6f", latitude)}, ${String.format(
-                "%.6f",
-                longitude
-            )})"
+        _textViewCoordenadas?.let {
+            _textViewCoordenadas.text =
+                "(${String.format("%.6f", latitude)}, ${String.format(
+                    "%.6f",
+                    longitude
+                )})"
+        }
     }
 
     @SuppressLint("SetTextI18n")
     fun updateTextViewCoordinates(text: String) {
-        _textViewCoordenadas.text = "($text)"
+        _textViewCoordenadas?.let {
+            _textViewCoordenadas.text = "($text)"
+        }
     }
 }
