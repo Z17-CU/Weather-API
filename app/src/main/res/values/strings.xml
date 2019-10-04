@@ -5,4 +5,5 @@
     <string name="gradosF">°F</string>
     <string name="gradosC">°C</string>
     <string name="grados">°</string>
+    <string name="enviar_la_ubicaci_n_seleccionada">Enviar la ubicación seleccionada</string>
 </resources>

@@ -13,4 +13,9 @@
     <color name="darkSeparatorsColor">#242424</color>
     <color name="textColor">#3d5c7b</color>
     <color name="textUnselectedColor">#9dadbc</color>
+
+    //* Location colors */
+
+    <color name="staticLocationColor">#679cc1</color>
+    <color name="dinamicLocationColor">#f15464</color>
 </resources>

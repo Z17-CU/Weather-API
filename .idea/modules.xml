@@ -4,6 +4,8 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Weather-API.iml" filepath="$PROJECT_DIR$/Weather-API.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/Weather-API-app.iml" filepath="$PROJECT_DIR$/app/Weather-API-app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Work Space-Weather-API.iml" filepath="$PROJECT_DIR$/Work Space-Weather-API.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/Work Space-Weather-API-app.iml" filepath="$PROJECT_DIR$/app/Work Space-Weather-API-app.iml" />
       <module fileurl="file://$PROJECT_DIR$/Work-Weather-API.iml" filepath="$PROJECT_DIR$/Work-Weather-API.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>

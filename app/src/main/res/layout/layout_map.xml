@@ -1,11 +1,76 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:orientation="vertical">
 
-    <org.osmdroid.views.MapView
-            android:id="@+id/_mapView"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent" />
+    <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+        <org.osmdroid.views.MapView
+                android:id="@+id/_mapView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center">
+
+            <ImageView
+                    android:id="@+id/_imageViewChincheta"
+                    android:layout_width="48dp"
+                    android:layout_height="60dp"
+                    android:src="@drawable/ic_location"
+                    android:contentDescription="@string/my_location" />
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+    <LinearLayout
+            android:id="@+id/_layoutStaticLocation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:background="@drawable/bg_location">
+
+        <ImageView
+                android:layout_margin="12dp"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:src="@drawable/ic_static_location"
+                android:contentDescription="@string/my_location" />
+
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+            <TextView
+                    android:paddingBottom="4dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/enviar_la_ubicaci_n_seleccionada"
+                    android:textColor="@color/staticLocationColor"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:maxLines="1"/>
+
+            <TextView
+                    android:id="@+id/_textViewCoordenadas"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="?colorOnSurface"
+                    android:maxLines="1"
+                    tools:text="(54125485 - 45468451)"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
 
 </LinearLayout>
