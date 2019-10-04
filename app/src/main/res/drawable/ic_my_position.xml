@@ -11,6 +11,6 @@
   <path
       android:pathData="M30,110a80,80 0,1 0,160 0a80,80 0,1 0,-160 0z"
       android:strokeWidth="1.5"
-      android:fillColor="#053fb2"
+      android:fillColor="#3263DF"
       android:strokeColor="#ffffff"/>
 </vector>

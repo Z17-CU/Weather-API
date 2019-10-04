@@ -11,7 +11,7 @@ data class TimeWeather(
     val coord: Coord,
     val dt: Int,
     @PrimaryKey
-    val id: Int,
+    var id: Int,
     val main: Main,
     val name: String,
     val sys: Sys,

@@ -44,7 +44,7 @@ class Converter {
     @TypeConverter
     fun stringToMain(data: String?): Main {
         if (data == null) {
-            return Main(0, 0, 0.0, 0.0, 0.0)
+            return Main(0.0, 0.0, 0.0, 0.0, 0.0)
         }
         val listType = object : TypeToken<Main>() {}.type
 

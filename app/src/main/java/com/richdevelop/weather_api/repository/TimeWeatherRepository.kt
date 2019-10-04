@@ -50,7 +50,7 @@ class TimeWeatherRepository @Inject constructor(
             return
         }
         locationManager.requestLocationUpdates(
-            LocationManager.NETWORK_PROVIDER, 60000, 0f, locationListener
+            LocationManager.NETWORK_PROVIDER, 60000 * 15, 0f, locationListener
         )
     }
 }

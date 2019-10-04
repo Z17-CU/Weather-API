@@ -17,11 +17,10 @@ abstract class AppDataBase : RoomDatabase() {
 
     abstract fun dao(): Dao
 
-    companion object {
+    companion object : SingletonHolder<AppDataBase, Context>({
 
-        fun instance(context: Context) = Room
-            .databaseBuilder(context, AppDataBase::class.java, DATA_BASE_NAME)
+        Room.databaseBuilder(it, AppDataBase::class.java, DATA_BASE_NAME)
             .fallbackToDestructiveMigration()
             .build()
-    }
+    })
 }

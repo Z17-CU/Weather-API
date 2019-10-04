@@ -12,7 +12,7 @@ class TimeWeatherViewModelFactory(private val context: Context) :
 
         return TimeWeatherViewModel(
             TimeWeatherRepository(
-                AppDataBase.instance(context).dao(),
+                AppDataBase.getInstance(context).dao(),
                 context
             )
         ) as TimeWeatherViewModel
