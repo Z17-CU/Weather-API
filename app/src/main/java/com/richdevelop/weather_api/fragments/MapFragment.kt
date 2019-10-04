@@ -130,9 +130,10 @@ class MapFragment : Fragment() {
                 }
                 mMarker!!.setOnMarkerClickListener { _, _ ->
                     hideFab()
-                    true
+                    false
                 }
                 mapView.overlays.add(mMarker)
+                mapView.invalidate()
 
                 if (autoCenter) {
                     centerMap(location)
