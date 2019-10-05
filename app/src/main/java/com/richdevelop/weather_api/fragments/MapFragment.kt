@@ -343,10 +343,14 @@ class MapFragment : Fragment() {
     /** Weather API */
     private fun replaceFragment(fragment: Fragment) {
         clearFullScreen()
-        parentFragmentManager
-            .beginTransaction()
-            .replace(R.id.layout_main, fragment)
-            .commit()
+        try {
+            parentFragmentManager
+                .beginTransaction()
+                .replace(R.id.layout_main, fragment)
+                .commit()
+        } catch (e: java.lang.Exception) {
+            e.printStackTrace()
+        }
     }
 
     private fun returnLocation() {
@@ -369,7 +373,9 @@ class MapFragment : Fragment() {
                         response.id = 1
                         response.coord.lat = mapView.mapCenter.latitude
                         response.coord.lon = mapView.mapCenter.longitude
-                        AppDataBase.getInstance(context!!).dao().insertTimeWeather(response)
+                        context?.let {
+                            AppDataBase.getInstance(context!!).dao().insertTimeWeather(response)
+                        }
 
                     } catch (e: Exception) {
                         e.printStackTrace()
