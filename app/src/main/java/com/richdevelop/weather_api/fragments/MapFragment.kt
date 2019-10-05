@@ -275,6 +275,7 @@ class MapFragment : Fragment() {
                             GeoPoint(location.latitude, location.longitude, location.altitude)
                     }
                     mMarker!!.setOnMarkerClickListener { _, _ ->
+                        centerMap(location)
                         hideFab()
                         false
                     }
