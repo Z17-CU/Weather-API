@@ -4,6 +4,8 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.res.Configuration.UI_MODE_NIGHT_MASK
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
@@ -29,6 +31,7 @@ import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.MapEventsOverlay
 import org.osmdroid.views.overlay.Marker
+import org.osmdroid.views.overlay.TilesOverlay.INVERT_COLORS
 import java.util.*
 
 
@@ -48,7 +51,7 @@ class MapFragment : Fragment() {
 
     var mMarker: Marker? = null
 
-    @SuppressLint("ClickableViewAccessibility", "MissingPermission")
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -61,21 +64,21 @@ class MapFragment : Fragment() {
         val view = inflater.inflate(R.layout.layout_map, container, false)
         mapView = view.findViewById(R.id._mapView)
 
-//        val tileSource = XYTileSource(
-//            "HOT", 1, 10, 256, ".png",
-//            arrayOf(
-//                "http://a.tiles.redcuba.cu/",
-//                "http://b.tiles.redcuba.cu/",
-//                "http://c.tiles.redcuba.cu/"
-//            ), "© OpenStreetMap contributors"
-//        )
-
-        //mapView.setTileSource(tileSource)
         mapView.setTileSource(TileSourceFactory.MAPNIK)
         mapView.controller.setCenter(GeoPoint(startLatitude, startLongitude, 10.0))
         mapView.controller.setZoom(6.5)
+        mapView.maxZoomLevel = 20.toDouble()
+        mapView.minZoomLevel = 3.toDouble()
         mapView.zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
         mapView.setMultiTouchControls(true)
+
+        activity?.let {
+            if (activity!!.resources.configuration.uiMode and
+                UI_MODE_NIGHT_MASK == UI_MODE_NIGHT_YES
+            ) {
+                mapView.overlayManager.tilesOverlay.setColorFilter(INVERT_COLORS)
+            }
+        }
 
         val mReceive = object : MapEventsReceiver {
             override fun singleTapConfirmedHelper(p: GeoPoint?): Boolean {
@@ -129,101 +132,9 @@ class MapFragment : Fragment() {
         layoutStaticLocation = view.findViewById(R.id._layoutStaticLocation)
         layoutStaticLocation.setOnClickListener {
 
-
             /** Aqui return location */
-
-            context?.let {
-
-                val url =
-                    "/data/2.5/weather?APPID=aaff1a7a058627a71698a204d3fa78b7&units=metric&lang=" + Locale.getDefault().language
-                val tempUrl =
-                    url + ("&lat=" + mapView.mapCenter.latitude + "&lon=" + mapView.mapCenter.longitude)
-
-                val execute = @SuppressLint("StaticFieldLeak")
-
-                object : AsyncTask<Void, Void, Void?>() {
-                    override fun doInBackground(vararg voids: Void?): Void? {
-
-                        val response: TimeWeather
-                        try {
-                            response =
-                                APIService.apiServiceWather.getTimeWeather(tempUrl).execute().body()!!
-                            response.id = 1
-                            response.coord.lat = mapView.mapCenter.latitude
-                            response.coord.lon = mapView.mapCenter.longitude
-                            AppDataBase.getInstance(context!!).dao().insertTimeWeather(response)
-
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                        }
-
-                        return null
-                    }
-
-                    override fun onPostExecute(result: Void?) {
-                        super.onPostExecute(result)
-                        /** Exit */
-                        cleanFullScreen()
-                        replaceFragment(TimeWeatherFragment())
-                    }
-                }
-                execute.execute()
-            }
-
+            returnLocation()
         }
-
-        val mLocationListener = object : LocationListener {
-            override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
-            }
-
-            override fun onProviderEnabled(provider: String?) {
-            }
-
-            override fun onProviderDisabled(provider: String?) {
-            }
-
-            override fun onLocationChanged(location: Location) {
-
-                lastLocation = location
-
-                if (mMarker == null) {
-                    mMarker = Marker(mapView)
-                    mMarker!!.setInfoWindow(null)
-                    context?.let {
-                        mMarker!!.icon =
-                            ContextCompat.getDrawable(context!!, R.drawable.ic_my_position)
-                    }
-                    mMarker!!.position =
-                        GeoPoint(location.latitude, location.longitude, location.altitude)
-                    mMarker!!.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
-                } else {
-                    mapView.overlays.remove(mMarker)
-                    mMarker!!.position =
-                        GeoPoint(location.latitude, location.longitude, location.altitude)
-                }
-                mMarker!!.setOnMarkerClickListener { _, _ ->
-                    hideFab()
-                    false
-                }
-                mapView.overlays.add(mMarker)
-                mapView.invalidate()
-
-                if (autoCenter) {
-                    centerMap(location)
-                } else {
-                    showFab()
-                }
-            }
-        }
-
-        val locationManager =
-            context?.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        locationManager.requestLocationUpdates(
-            LocationManager.GPS_PROVIDER,
-            1000,
-            10f,
-            mLocationListener
-        )
         return view
     }
 
@@ -235,12 +146,14 @@ class MapFragment : Fragment() {
         view.requestFocus()
         view.setOnKeyListener { _, keyCode, _ ->
             if (keyCode == KeyEvent.KEYCODE_BACK) {
-                cleanFullScreen()
+                clearFullScreen()
                 replaceFragment(TimeWeatherFragment())
                 return@setOnKeyListener true
             }
             false
         }
+
+        initLocationListener()
 
     }
 
@@ -255,16 +168,16 @@ class MapFragment : Fragment() {
     }
 
     private fun centerMap(location: Location) {
-        if (mapView.zoomLevelDouble < 15) {
-            mapView.controller.setZoom(15.toDouble())
-        }
-        mapView.controller.animateTo(
-            GeoPoint(
-                location.latitude,
-                location.longitude,
-                location.altitude
-            )
+        val point = GeoPoint(
+            location.latitude,
+            location.longitude,
+            location.altitude
         )
+        if (mapView.zoomLevelDouble < 18) {
+            mapView.controller.animateTo(point, 18.toDouble(), 1000)
+        } else {
+            mapView.controller.animateTo(point)
+        }
         updateTextViewCoordinates("Current location")
         hideFab()
     }
@@ -320,10 +233,71 @@ class MapFragment : Fragment() {
         _textViewCoordenadas?.let {
             _textViewCoordenadas.text = "($text)"
         }
+        _progressBarLoading?.let {
+            _progressBarLoading.visibility = View.GONE
+        }
     }
 
-    private fun cleanFullScreen() {
+    private fun clearFullScreen() {
         activity?.window?.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun initLocationListener() {
+        val mLocationListener = object : LocationListener {
+            override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
+            }
+
+            override fun onProviderEnabled(provider: String?) {
+            }
+
+            override fun onProviderDisabled(provider: String?) {
+            }
+
+            override fun onLocationChanged(location: Location) {
+
+                _mapView?.let {
+                    lastLocation = location
+
+                    if (mMarker == null) {
+                        mMarker = Marker(_mapView)
+                        mMarker!!.setInfoWindow(null)
+                        context?.let {
+                            mMarker!!.icon =
+                                ContextCompat.getDrawable(context!!, R.drawable.ic_my_position)
+                        }
+                        mMarker!!.position =
+                            GeoPoint(location.latitude, location.longitude, location.altitude)
+                        mMarker!!.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
+                    } else {
+                        mapView.overlays.remove(mMarker)
+                        mMarker!!.position =
+                            GeoPoint(location.latitude, location.longitude, location.altitude)
+                    }
+                    mMarker!!.setOnMarkerClickListener { _, _ ->
+                        hideFab()
+                        false
+                    }
+                    mapView.overlays.add(mMarker)
+                    mapView.invalidate()
+
+                    if (autoCenter) {
+                        centerMap(location)
+                    } else {
+                        showFab()
+                    }
+                }
+            }
+        }
+
+        val locationManager =
+            context?.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        locationManager.requestLocationUpdates(
+            LocationManager.GPS_PROVIDER,
+            1000,
+            10f,
+            mLocationListener
+        )
     }
 
     /** Weather API */
@@ -332,5 +306,45 @@ class MapFragment : Fragment() {
             .beginTransaction()
             .replace(R.id.layout_main, fragment)
             .commit()
+    }
+
+    private fun returnLocation() {
+        context?.let {
+
+            val url =
+                "/data/2.5/weather?APPID=aaff1a7a058627a71698a204d3fa78b7&units=metric&lang=" + Locale.getDefault().language
+            val tempUrl =
+                url + ("&lat=" + mapView.mapCenter.latitude + "&lon=" + mapView.mapCenter.longitude)
+
+            val execute = @SuppressLint("StaticFieldLeak")
+
+            object : AsyncTask<Void, Void, Void?>() {
+                override fun doInBackground(vararg voids: Void?): Void? {
+
+                    val response: TimeWeather
+                    try {
+                        response =
+                            APIService.apiServiceWather.getTimeWeather(tempUrl).execute().body()!!
+                        response.id = 1
+                        response.coord.lat = mapView.mapCenter.latitude
+                        response.coord.lon = mapView.mapCenter.longitude
+                        AppDataBase.getInstance(context!!).dao().insertTimeWeather(response)
+
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+
+                    return null
+                }
+
+                override fun onPostExecute(result: Void?) {
+                    super.onPostExecute(result)
+                    /** Exit */
+                    clearFullScreen()
+                    replaceFragment(TimeWeatherFragment())
+                }
+            }
+            execute.execute()
+        }
     }
 }

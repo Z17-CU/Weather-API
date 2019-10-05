@@ -11,6 +11,8 @@
         <item name="text_color">?colorOnSurface</item>
         <item name="separator_color">@color/darkSeparatorsColor</item>
 
+        <item name="fabLocationBackground">?colorSurface</item>
+
         <item name="bg_location_color">@color/bg_location_color_Night</item>
     </style>
 

@@ -6,6 +6,11 @@
     <attr name="separator_color" format="reference|color" />
 
     <attr name="bg_location_color" format="reference|color" />
+
     <attr name="colorAccent" format="reference|color" />
+    <attr name="colorPrimary" format="reference|color" />
+    <attr name="colorPrimaryDark" format="reference|color" />
+
+    <attr name="fabLocationBackground" format="reference|color"/>
 
 </resources>
