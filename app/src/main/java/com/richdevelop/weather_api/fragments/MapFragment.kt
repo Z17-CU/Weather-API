@@ -6,6 +6,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.Configuration.UI_MODE_NIGHT_MASK
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
+import android.graphics.Color
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
@@ -69,6 +70,8 @@ class MapFragment : Fragment() {
         mapView.controller.setZoom(6.5)
         mapView.maxZoomLevel = 20.toDouble()
         mapView.minZoomLevel = 3.toDouble()
+        mapView.overlayManager.tilesOverlay.loadingBackgroundColor = Color.TRANSPARENT
+        mapView.overlayManager.tilesOverlay.loadingLineColor = Color.TRANSPARENT
         mapView.zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
         mapView.setMultiTouchControls(true)
 
