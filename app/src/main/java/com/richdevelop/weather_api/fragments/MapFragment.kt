@@ -9,10 +9,11 @@ import android.location.LocationListener
 import android.location.LocationManager
 import android.os.AsyncTask
 import android.os.Bundle
-import android.preference.PreferenceManager
+import androidx.preference.PreferenceManager.getDefaultSharedPreferences
 import android.view.*
 import android.widget.ImageView
 import android.widget.LinearLayout
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.richdevelop.weather_api.R
@@ -21,18 +22,21 @@ import com.richdevelop.weather_api.repository.room.AppDataBase
 import com.richdevelop.weather_api.repository.room.entitys.TimeWeather
 import kotlinx.android.synthetic.main.layout_map.*
 import org.osmdroid.config.Configuration
+import org.osmdroid.events.MapEventsReceiver
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapView
+import org.osmdroid.views.overlay.MapEventsOverlay
 import org.osmdroid.views.overlay.Marker
 import java.util.*
 
 
 class MapFragment : Fragment() {
 
-    lateinit var mapView: MapView
-    lateinit var layoutStaticLocation: LinearLayout
-    lateinit var fabLocation: FloatingActionButton
+    private lateinit var mapView: MapView
+    private lateinit var layoutStaticLocation: LinearLayout
+    private lateinit var fabLocation: FloatingActionButton
 
     var lastLocation: Location? = null
 
@@ -53,7 +57,7 @@ class MapFragment : Fragment() {
 
         activity?.window?.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
         Configuration.getInstance()
-            .load(context, PreferenceManager.getDefaultSharedPreferences(context))
+            .load(context, getDefaultSharedPreferences(context))
         val view = inflater.inflate(R.layout.layout_map, container, false)
         mapView = view.findViewById(R.id._mapView)
 
@@ -68,10 +72,24 @@ class MapFragment : Fragment() {
 
         //mapView.setTileSource(tileSource)
         mapView.setTileSource(TileSourceFactory.MAPNIK)
-        mapView.controller.animateTo(GeoPoint(startLatitude, startLongitude, 10.0))
+        mapView.controller.setCenter(GeoPoint(startLatitude, startLongitude, 10.0))
         mapView.controller.setZoom(6.5)
-        mapView.setBuiltInZoomControls(false)
+        mapView.zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
         mapView.setMultiTouchControls(true)
+
+        val mReceive = object : MapEventsReceiver {
+            override fun singleTapConfirmedHelper(p: GeoPoint?): Boolean {
+                return false
+            }
+
+            override fun longPressHelper(p: GeoPoint?): Boolean {
+                mapView.controller.animateTo(p)
+                return false
+            }
+        }
+        val overlayEvents = MapEventsOverlay(mReceive)
+        mapView.overlays.add(overlayEvents)
+        mapView.invalidate()
 
         fabLocation = view.findViewById(R.id._fabLocation)
         fabLocation.setOnClickListener {
@@ -171,7 +189,10 @@ class MapFragment : Fragment() {
                 if (mMarker == null) {
                     mMarker = Marker(mapView)
                     mMarker!!.setInfoWindow(null)
-                    mMarker!!.setIcon(context?.resources?.getDrawable(R.drawable.ic_my_position))
+                    context?.let {
+                        mMarker!!.icon =
+                            ContextCompat.getDrawable(context!!, R.drawable.ic_my_position)
+                    }
                     mMarker!!.position =
                         GeoPoint(location.latitude, location.longitude, location.altitude)
                     mMarker!!.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
@@ -208,7 +229,6 @@ class MapFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        updateTextViewCoordinates(startLatitude, startLongitude)
 
         //on back pressed
         view.isFocusableInTouchMode = true
@@ -289,6 +309,9 @@ class MapFragment : Fragment() {
                     "%.6f",
                     longitude
                 )})"
+        }
+        _progressBarLoading?.let {
+            _progressBarLoading.visibility = View.GONE
         }
     }
 

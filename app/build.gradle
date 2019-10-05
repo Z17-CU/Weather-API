@@ -46,6 +46,7 @@ dependencies {
 
     /** Maps */
     implementation 'org.osmdroid:osmdroid-android:6.1.2'
+    implementation "androidx.preference:preference:1.1.0"
 
     /** Multidex */
     implementation 'com.android.support:multidex:1.0.3'

@@ -87,13 +87,29 @@
                     android:textSize="18sp"
                     android:textStyle="bold" />
 
-            <TextView
-                    android:id="@+id/_textViewCoordenadas"
-                    android:layout_width="wrap_content"
+            <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:maxLines="1"
-                    android:textColor="?colorOnSurface"
-                    android:text="@string/loading" />
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                <TextView
+                        android:id="@+id/_textViewCoordenadas"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:maxLines="1"
+                        android:textColor="?colorOnSurface"
+                        android:text="@string/loading" />
+
+                <ProgressBar
+                        android:id="@+id/_progressBarLoading"
+                        android:layout_marginStart="4dp"
+                        android:indeterminateTint="?colorOnSurface"
+                        android:layout_width="14dp"
+                        android:layout_height="14dp"
+                        android:indeterminate="true" />
+
+            </LinearLayout>
 
         </LinearLayout>
 
