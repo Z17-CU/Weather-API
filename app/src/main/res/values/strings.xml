@@ -7,4 +7,6 @@
     <string name="grados">°</string>
     <string name="enviar_la_ubicaci_n_seleccionada">Enviar la ubicación seleccionada</string>
     <string name="loading">Esperando ubicación…</string>
+    <string name="requiredLocationPermission">Permiso de ubicación no concedido</string>
+    <string name="requiredStoragePermission">Permiso de almacenamiento no concedido</string>
 </resources>

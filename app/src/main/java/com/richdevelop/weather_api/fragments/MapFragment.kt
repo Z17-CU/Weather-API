@@ -1,9 +1,11 @@
 package com.richdevelop.weather_api.fragments
 
+import android.Manifest
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.pm.PackageManager
 import android.content.res.Configuration.UI_MODE_NIGHT_MASK
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.graphics.Color
@@ -12,12 +14,13 @@ import android.location.LocationListener
 import android.location.LocationManager
 import android.os.AsyncTask
 import android.os.Bundle
-import androidx.preference.PreferenceManager.getDefaultSharedPreferences
 import android.view.*
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.preference.PreferenceManager.getDefaultSharedPreferences
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.richdevelop.weather_api.R
 import com.richdevelop.weather_api.repository.retrofit.APIService
@@ -52,14 +55,43 @@ class MapFragment : Fragment() {
 
     var mMarker: Marker? = null
 
-    @SuppressLint("ClickableViewAccessibility")
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
 
+        if (ContextCompat.checkSelfPermission(
+                context!!,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            Toast.makeText(
+                context,
+                context!!.resources.getString(R.string.requiredStoragePermission),
+                Toast.LENGTH_SHORT
+            ).show()
+            return view
+        }
+
         activity?.window?.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+        val view = onClickListeners(initView(inflater, container))
+        initLocationListener()
+
+        return view
+    }
+
+    override fun onPause() {
+        super.onPause()
+        _mapView?.let { _mapView.onPause() }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        _mapView?.let { _mapView.onResume() }
+    }
+
+    private fun initView(inflater: LayoutInflater, container: ViewGroup?): View {
         Configuration.getInstance()
             .load(context, getDefaultSharedPreferences(context))
         val view = inflater.inflate(R.layout.layout_map, container, false)
@@ -83,6 +115,15 @@ class MapFragment : Fragment() {
             }
         }
 
+        view.findViewById<ImageView>(R.id._imageViewChinchetaShadow).alpha = 0.5.toFloat()
+        layoutStaticLocation = view.findViewById(R.id._layoutStaticLocation)
+        fabLocation = view.findViewById(R.id._fabLocation)
+
+        return view
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    private fun onClickListeners(view: View): View {
         val mReceive = object : MapEventsReceiver {
             override fun singleTapConfirmedHelper(p: GeoPoint?): Boolean {
                 return false
@@ -97,15 +138,12 @@ class MapFragment : Fragment() {
         mapView.overlays.add(overlayEvents)
         mapView.invalidate()
 
-        fabLocation = view.findViewById(R.id._fabLocation)
         fabLocation.setOnClickListener {
             if (lastLocation != null) {
                 centerMap(lastLocation!!)
                 autoCenter = true
             }
         }
-
-        view.findViewById<ImageView>(R.id._imageViewChinchetaShadow).alpha = 0.5.toFloat()
 
         mapView.setOnTouchListener { _, event ->
 
@@ -132,42 +170,23 @@ class MapFragment : Fragment() {
             false
         }
 
-        layoutStaticLocation = view.findViewById(R.id._layoutStaticLocation)
-        layoutStaticLocation.setOnClickListener {
-
-            /** Aqui return location */
-            returnLocation()
-        }
-        return view
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        //on back pressed
         view.isFocusableInTouchMode = true
         view.requestFocus()
         view.setOnKeyListener { _, keyCode, _ ->
             if (keyCode == KeyEvent.KEYCODE_BACK) {
-                clearFullScreen()
+                /** Exit */
                 replaceFragment(TimeWeatherFragment())
                 return@setOnKeyListener true
             }
             false
         }
 
-        initLocationListener()
+        layoutStaticLocation.setOnClickListener {
 
-    }
-
-    override fun onPause() {
-        super.onPause()
-        mapView.onPause()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        mapView.onResume()
+            /** Here return staticLocation */
+            returnLocation()
+        }
+        return view
     }
 
     private fun centerMap(location: Location) {
@@ -245,67 +264,85 @@ class MapFragment : Fragment() {
         activity?.window?.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
     }
 
-    @SuppressLint("MissingPermission")
+
     private fun initLocationListener() {
-        val mLocationListener = object : LocationListener {
-            override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
+
+        context?.let {
+
+            if (ContextCompat.checkSelfPermission(
+                    context!!,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                Toast.makeText(
+                    context,
+                    context!!.resources.getString(R.string.requiredLocationPermission),
+                    Toast.LENGTH_SHORT
+                ).show()
+                return
             }
 
-            override fun onProviderEnabled(provider: String?) {
-            }
+            val mLocationListener = object : LocationListener {
+                override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
+                }
 
-            override fun onProviderDisabled(provider: String?) {
-            }
+                override fun onProviderEnabled(provider: String?) {
+                }
 
-            override fun onLocationChanged(location: Location) {
+                override fun onProviderDisabled(provider: String?) {
+                }
 
-                _mapView?.let {
-                    lastLocation = location
+                override fun onLocationChanged(location: Location) {
 
-                    if (mMarker == null) {
-                        mMarker = Marker(_mapView)
-                        mMarker!!.setInfoWindow(null)
-                        context?.let {
-                            mMarker!!.icon =
-                                ContextCompat.getDrawable(context!!, R.drawable.ic_my_position)
+                    _mapView?.let {
+                        lastLocation = location
+
+                        if (mMarker == null) {
+                            mMarker = Marker(_mapView)
+                            mMarker!!.setInfoWindow(null)
+                            context?.let {
+                                mMarker!!.icon =
+                                    ContextCompat.getDrawable(context!!, R.drawable.ic_my_position)
+                            }
+                            mMarker!!.position =
+                                GeoPoint(location.latitude, location.longitude, location.altitude)
+                            mMarker!!.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
+                        } else {
+                            mapView.overlays.remove(mMarker)
+                            mMarker!!.position =
+                                GeoPoint(location.latitude, location.longitude, location.altitude)
                         }
-                        mMarker!!.position =
-                            GeoPoint(location.latitude, location.longitude, location.altitude)
-                        mMarker!!.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
-                    } else {
-                        mapView.overlays.remove(mMarker)
-                        mMarker!!.position =
-                            GeoPoint(location.latitude, location.longitude, location.altitude)
-                    }
-                    mMarker!!.setOnMarkerClickListener { _, _ ->
-                        centerMap(location)
-                        hideFab()
-                        false
-                    }
-                    mapView.overlays.add(mMarker)
-                    mapView.invalidate()
+                        mMarker!!.setOnMarkerClickListener { _, _ ->
+                            centerMap(location)
+                            hideFab()
+                            false
+                        }
+                        mapView.overlays.add(mMarker)
+                        mapView.invalidate()
 
-                    if (autoCenter) {
-                        centerMap(location)
-                    } else {
-                        showFab()
+                        if (autoCenter) {
+                            centerMap(location)
+                        } else {
+                            showFab()
+                        }
                     }
                 }
             }
-        }
 
-        val locationManager =
-            context?.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        locationManager.requestLocationUpdates(
-            LocationManager.GPS_PROVIDER,
-            1000,
-            10f,
-            mLocationListener
-        )
+            val locationManager =
+                context?.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+            locationManager.requestLocationUpdates(
+                LocationManager.GPS_PROVIDER,
+                1000,
+                10f,
+                mLocationListener
+            )
+        }
     }
 
     /** Weather API */
     private fun replaceFragment(fragment: Fragment) {
+        clearFullScreen()
         parentFragmentManager
             .beginTransaction()
             .replace(R.id.layout_main, fragment)
@@ -344,7 +381,6 @@ class MapFragment : Fragment() {
                 override fun onPostExecute(result: Void?) {
                     super.onPostExecute(result)
                     /** Exit */
-                    clearFullScreen()
                     replaceFragment(TimeWeatherFragment())
                 }
             }
