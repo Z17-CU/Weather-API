@@ -263,7 +263,7 @@ class MapFragment : Fragment() {
     @SuppressLint("SetTextI18n")
     fun updateTextViewCoordinates(text: String) {
         _textViewCoordenadas?.let {
-            _textViewCoordenadas.text = "($text)"
+            _textViewCoordenadas.text = text
         }
         _progressBarLoading?.let {
             _progressBarLoading.visibility = View.GONE
@@ -304,6 +304,11 @@ class MapFragment : Fragment() {
 
                 override fun onLocationChanged(location: Location) {
 
+                    if (location.provider == LocationManager.NETWORK_PROVIDER) {
+                        if (lastLocation != null && location.accuracy > lastLocation!!.accuracy) {
+                            return
+                        }
+                    }
                     _mapView?.let {
                         lastLocation = location
                         val point =
@@ -355,6 +360,12 @@ class MapFragment : Fragment() {
 
             val locationManager =
                 context?.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+            locationManager.requestLocationUpdates(
+                LocationManager.NETWORK_PROVIDER,
+                1000,
+                2f,
+                mLocationListener
+            )
             locationManager.requestLocationUpdates(
                 LocationManager.GPS_PROVIDER,
                 500,
