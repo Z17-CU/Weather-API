@@ -9,4 +9,7 @@
     <string name="loading">Esperando ubicación…</string>
     <string name="requiredLocationPermission">Permiso de ubicación no concedido</string>
     <string name="requiredStoragePermission">Permiso de almacenamiento no concedido</string>
+    <string name="currentLocation">Ubicación actual.</string>
+    <string name="exact">Exacto</string>
+    <string name="meters">m</string>
 </resources>

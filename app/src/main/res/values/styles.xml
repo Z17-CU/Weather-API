@@ -12,6 +12,7 @@
         <item name="separator_color">@color/separatorsColor</item>
 
         <item name="fabLocationBackground">@color/colorAccent</item>
+        <item name="accuracyColor">@color/accuracyColor_Day</item>
 
         <item name="bg_location_color">@color/bg_location_color_Day</item>
     </style>

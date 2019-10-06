@@ -12,5 +12,6 @@
     <attr name="colorPrimaryDark" format="reference|color" />
 
     <attr name="fabLocationBackground" format="reference|color"/>
+    <attr name="accuracyColor" format="reference|color"/>
 
 </resources>

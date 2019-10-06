@@ -14,10 +14,12 @@ import android.location.LocationListener
 import android.location.LocationManager
 import android.os.AsyncTask
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.*
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Toast
+import androidx.annotation.ColorInt
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager.getDefaultSharedPreferences
@@ -26,6 +28,7 @@ import com.richdevelop.weather_api.R
 import com.richdevelop.weather_api.repository.retrofit.APIService
 import com.richdevelop.weather_api.repository.room.AppDataBase
 import com.richdevelop.weather_api.repository.room.entitys.TimeWeather
+import com.richdevelop.weather_api.utils.AccuracyOverlay
 import kotlinx.android.synthetic.main.layout_map.*
 import org.osmdroid.config.Configuration
 import org.osmdroid.events.MapEventsReceiver
@@ -54,6 +57,9 @@ class MapFragment : Fragment() {
     private var autoCenter = true
 
     var mMarker: Marker? = null
+    var accuracyOverlay: AccuracyOverlay? = null
+    @ColorInt
+    var accuracyColor: Int = 0
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -200,7 +206,11 @@ class MapFragment : Fragment() {
         } else {
             mapView.controller.animateTo(point)
         }
-        updateTextViewCoordinates("Current location")
+        updateTextViewCoordinates(
+            "${resources.getString(R.string.currentLocation)} ${resources.getString(
+                R.string.exact
+            )} ${location.accuracy}${resources.getString(R.string.meters)}"
+        )
         hideFab()
     }
 
@@ -296,6 +306,8 @@ class MapFragment : Fragment() {
 
                     _mapView?.let {
                         lastLocation = location
+                        val point =
+                            GeoPoint(location.latitude, location.longitude, location.altitude)
 
                         if (mMarker == null) {
                             mMarker = Marker(_mapView)
@@ -304,19 +316,31 @@ class MapFragment : Fragment() {
                                 mMarker!!.icon =
                                     ContextCompat.getDrawable(context!!, R.drawable.ic_my_position)
                             }
-                            mMarker!!.position =
-                                GeoPoint(location.latitude, location.longitude, location.altitude)
+                            mMarker!!.position = point
                             mMarker!!.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
                         } else {
                             mapView.overlays.remove(mMarker)
-                            mMarker!!.position =
-                                GeoPoint(location.latitude, location.longitude, location.altitude)
+                            mMarker!!.position = point
                         }
                         mMarker!!.setOnMarkerClickListener { _, _ ->
                             centerMap(location)
                             hideFab()
                             false
                         }
+
+                        if (accuracyOverlay != null) {
+                            mapView.overlays.remove(accuracyOverlay)
+                        } else {
+                            val typedValue = TypedValue()
+                            val theme = context!!.theme
+                            theme.resolveAttribute(R.attr.accuracyColor, typedValue, true)
+                            accuracyColor = typedValue.data
+                        }
+                        accuracyOverlay = AccuracyOverlay(
+                            point, location.accuracy, accuracyColor
+                        )
+                        mapView.overlays.add(accuracyOverlay)
+
                         mapView.overlays.add(mMarker)
                         mapView.invalidate()
 
@@ -333,8 +357,8 @@ class MapFragment : Fragment() {
                 context?.getSystemService(Context.LOCATION_SERVICE) as LocationManager
             locationManager.requestLocationUpdates(
                 LocationManager.GPS_PROVIDER,
-                1000,
-                10f,
+                500,
+                0f,
                 mLocationListener
             )
         }
