@@ -358,7 +358,7 @@ class MapFragment : Fragment() {
             locationManager.requestLocationUpdates(
                 LocationManager.GPS_PROVIDER,
                 500,
-                0f,
+                2f,
                 mLocationListener
             )
         }

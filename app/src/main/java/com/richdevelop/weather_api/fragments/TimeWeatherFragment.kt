@@ -125,10 +125,12 @@ class TimeWeatherFragment : Fragment() {
 
             override fun doInBackground(vararg voids: Void?): Void? {
 
-                requestBuilder = Glide.with(context!!)
-                    .load(IMAGE_URL + iconName + IMAGE_URL_END)
-                    .apply(glideOptions!!)
-                    .apply(RequestOptions().override(100, 100))
+                context?.let {
+                    requestBuilder = Glide.with(context!!)
+                        .load(IMAGE_URL + iconName + IMAGE_URL_END)
+                        .apply(glideOptions!!)
+                        .apply(RequestOptions().override(100, 100))
+                }
 
                 return null
             }
