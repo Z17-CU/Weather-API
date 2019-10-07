@@ -201,8 +201,16 @@ class MapFragment : Fragment() {
             location.longitude,
             location.altitude
         )
-        if (mapView.zoomLevelDouble < 18) {
-            mapView.controller.animateTo(point, 18.toDouble(), 1000)
+
+        val zoom = when {
+            location.accuracy < 100 -> 18
+            location.accuracy < 500 -> 16
+            location.accuracy < 1000 -> 14
+            else -> 13
+        }
+
+        if (mapView.zoomLevelDouble < zoom) {
+            mapView.controller.animateTo(point, zoom.toDouble(), 1000)
         } else {
             mapView.controller.animateTo(point)
         }
