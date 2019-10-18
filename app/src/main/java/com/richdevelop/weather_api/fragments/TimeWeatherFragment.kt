@@ -23,11 +23,16 @@ import com.richdevelop.weather_api.utils.Const.Companion.IMAGE_URL_END
 import com.richdevelop.weather_api.viewModel.TimeWeatherViewModel
 import com.richdevelop.weather_api.viewModel.TimeWeatherViewModelFactory
 import kotlinx.android.synthetic.main.fragment_main.*
+import me.yokeyword.fragmentation.ISupportFragment
 import me.yokeyword.fragmentation.SupportFragment
 import java.util.*
 
 
 class TimeWeatherFragment : SupportFragment() {
+
+    companion object {
+        const val PICK_LOCATION = 1
+    }
 
     private lateinit var viewModel: TimeWeatherViewModel
 
@@ -108,6 +113,55 @@ class TimeWeatherFragment : SupportFragment() {
         onClicks()
     }
 
+    override fun onFragmentResult(requestCode: Int, resultCode: Int, mData: Bundle?) {
+        super.onFragmentResult(requestCode, resultCode, mData)
+        if (resultCode == ISupportFragment.RESULT_OK) {
+            when (requestCode) {
+                PICK_LOCATION -> {
+                    val lat = mData?.getDouble(MapFragment.LATITUDE) ?: 0.0
+                    val long = mData?.getDouble(MapFragment.LONGITUDE) ?: 0.0
+                    val zoom = mData?.getDouble(MapFragment.ZOOM) ?: 0.0
+                    if (lat != 0.0 && long != 0.0 && zoom != 0.0)
+                        getAndSaveWeather(lat, long)
+                }
+            }
+        }
+    }
+
+    private fun getAndSaveWeather(lat: Double, lon: Double) {
+        context?.let {
+
+            val url =
+                "/data/2.5/weather?APPID=aaff1a7a058627a71698a204d3fa78b7&units=metric&lang=" + Locale.getDefault().language
+            val tempUrl = "$url&lat=$lat&lon=$lon"
+
+            val execute = @SuppressLint("StaticFieldLeak")
+
+            object : AsyncTask<Void, Void, Void?>() {
+                override fun doInBackground(vararg voids: Void?): Void? {
+
+                    val response: TimeWeather
+                    try {
+                        response =
+                            APIService.apiServiceWather.getTimeWeather(tempUrl).execute().body()!!
+                        response.id = 1
+                        response.coord.lat = lat
+                        response.coord.lon = lon
+                        context?.let {
+                            AppDataBase.getInstance(context!!).dao().insertTimeWeather(response)
+                        }
+
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+
+                    return null
+                }
+            }
+            execute.execute()
+        }
+    }
+
     private fun loadImage(iconName: String) {
         val execute = @SuppressLint("StaticFieldLeak")
         object : AsyncTask<Void, Void, Void?>() {
@@ -140,7 +194,7 @@ class TimeWeatherFragment : SupportFragment() {
 
     private fun onClicks() {
         _locationImageView.setOnClickListener {
-            start(MapFragment())
+            startForResult(MapFragment(), PICK_LOCATION)
         }
 
         _refreshImageView.setOnClickListener {
