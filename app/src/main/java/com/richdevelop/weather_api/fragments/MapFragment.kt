@@ -1,8 +1,6 @@
 package com.richdevelop.weather_api.fragments
 
 import android.Manifest
-import android.animation.Animator
-import android.animation.AnimatorListenerAdapter
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
@@ -12,7 +10,6 @@ import android.graphics.Color
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
-import android.os.AsyncTask
 import android.os.Bundle
 import android.util.TypedValue
 import android.view.*
@@ -21,15 +18,13 @@ import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.annotation.ColorInt
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager.getDefaultSharedPreferences
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.richdevelop.weather_api.R
-import com.richdevelop.weather_api.repository.retrofit.APIService
-import com.richdevelop.weather_api.repository.room.AppDataBase
-import com.richdevelop.weather_api.repository.room.entitys.TimeWeather
 import com.richdevelop.weather_api.utils.AccuracyOverlay
-import kotlinx.android.synthetic.main.layout_map.*
+import kotlinx.android.synthetic.main.fragment_map.*
+import me.yokeyword.fragmentation.ISupportFragment
+import me.yokeyword.fragmentation.SupportFragment
 import org.osmdroid.config.Configuration
 import org.osmdroid.events.MapEventsReceiver
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
@@ -39,25 +34,65 @@ import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.MapEventsOverlay
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.TilesOverlay.INVERT_COLORS
-import java.util.*
 
+/**
+ * Created by richard on 4/10/19.
+ */
 
-class MapFragment : Fragment() {
+/** To init like viewer
+ *
+val fragment = MapFragment()
+val bundle = Bundle()
+bundle.putDouble(MapFragment.START_LATITUDE, locationContent.lat)
+bundle.putDouble(MapFragment.START_LONGITUDE, locationContent.lon)
+bundle.putDouble(MapFragment.FRIEND_LATITUDE, locationContent.lat)
+bundle.putDouble(MapFragment.FRIEND_LONGITUDE, locationContent.lon)
+bundle.putDouble(MapFragment.START_ZOOM, locationContent.zoom)
+bundle.putBoolean(MapFragment.START_LIKE_VIEWER, true)
+bundle.putBoolean(MapFragment.AUTO_CENTER, false)
+fragment.arguments = bundle
+start(fragment)
+ */
+
+class MapFragment : SupportFragment() {
+
+    companion object {
+        const val LATITUDE = "LATITUDE"
+        const val LONGITUDE = "LONGITUDE"
+        const val FRIEND_LATITUDE = "FRIEND_LATITUDE"
+        const val FRIEND_LONGITUDE = "FRIEND_LONGITUDE"
+        const val ZOOM = "ZOOM"
+        const val START_LATITUDE = "START_LATITUDE"
+        const val START_LONGITUDE = "START_LONGITUDE"
+        const val START_ZOOM = "START_ZOOM"
+        const val AUTO_CENTER = "AUTO_CENTER"
+        const val LAST_LOCATION = "LAST_LOCATION"
+        const val START_LIKE_VIEWER = "START_LIKE_VIEWER"
+    }
 
     private lateinit var mapView: MapView
     private lateinit var layoutStaticLocation: LinearLayout
     private lateinit var fabLocation: FloatingActionButton
 
-    var lastLocation: Location? = null
+    private var lastLocation: Location? = null
 
     //Start in center of Cuba
-    private val startLatitude = 22.261369
-    private val startLongitude = -79.577868
+    private var startLatitude = 22.261369
+    private var startLongitude = -79.577868
+    private var friendLatitude = 0.0
+    private var friendLongitude = 0.0
+    private var startZoom = 6.5
+
+    private var startLikeViewer = false
 
     private var autoCenter = true
 
-    var mMarker: Marker? = null
-    var accuracyOverlay: AccuracyOverlay? = null
+    private var mMarker: Marker? = null
+    private var accuracyOverlay: AccuracyOverlay? = null
+
+    private lateinit var locationManager: LocationManager
+    private lateinit var mLocationListener: LocationListener
+
     @ColorInt
     var accuracyColor: Int = 0
 
@@ -81,33 +116,93 @@ class MapFragment : Fragment() {
         }
 
         activity?.window?.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
-        val view = onClickListeners(initView(inflater, container))
+
+        arguments?.let {
+            autoCenter = it.getBoolean(AUTO_CENTER, autoCenter)
+            startLatitude = it.getDouble(START_LATITUDE, startLatitude)
+            startLongitude = it.getDouble(START_LONGITUDE, startLongitude)
+            startZoom = it.getDouble(START_ZOOM, startZoom)
+            lastLocation = it.getParcelable(LAST_LOCATION)
+            startLikeViewer = it.getBoolean(START_LIKE_VIEWER, startLikeViewer)
+            friendLatitude = it.getDouble(FRIEND_LATITUDE, friendLatitude)
+            friendLongitude = it.getDouble(FRIEND_LONGITUDE, friendLongitude)
+        }
+
         initLocationListener()
 
-        return view
+        return onClickListeners(initView(inflater, container))
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        lastLocation?.let {
+            paintMarker(lastLocation!!)
+            updateTextViewCoordinates(lastLocation!!.latitude, lastLocation!!.longitude)
+            if (!autoCenter) {
+                showFab()
+            }
+        }
+        if (startLikeViewer) {
+            _imageViewChincheta.visibility = View.GONE
+            _imageViewChinchetaShadow.visibility = View.GONE
+            _layoutStaticLocation.visibility = View.GONE
+            paintMarkerFriend(GeoPoint(friendLatitude, friendLongitude, 10.0))
+        }
     }
 
     override fun onPause() {
         super.onPause()
         _mapView?.let { _mapView.onPause() }
+        stopLocationListener()
     }
 
     override fun onResume() {
         super.onResume()
         _mapView?.let { _mapView.onResume() }
+        startLocationListener()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+
+        arguments?.let {
+            arguments!!.putBoolean(AUTO_CENTER, autoCenter)
+            _mapView?.let {
+                arguments!!.putDouble(START_LATITUDE, _mapView.mapCenter.latitude)
+                arguments!!.putDouble(START_LONGITUDE, _mapView.mapCenter.longitude)
+                arguments!!.putDouble(START_ZOOM, _mapView.zoomLevelDouble)
+            }
+            arguments!!.putBoolean(START_LIKE_VIEWER, startLikeViewer)
+            arguments!!.putParcelable(LAST_LOCATION, lastLocation)
+            arguments!!.putDouble(FRIEND_LATITUDE, friendLatitude)
+            arguments!!.putDouble(FRIEND_LONGITUDE, friendLongitude)
+        }
+
+        super.onSaveInstanceState(outState)
     }
 
     private fun initView(inflater: LayoutInflater, container: ViewGroup?): View {
         Configuration.getInstance()
             .load(context, getDefaultSharedPreferences(context))
-        val view = inflater.inflate(R.layout.layout_map, container, false)
+        Configuration.getInstance().isDebugMode = true
+
+        /** Custom tiles with authentication*/
+        //Configuration.getInstance().additionalHttpRequestProperties["Authorization"] = "Bearer ${ToDusAuth.getInstance().currentOwner?.owner?.credential?.token}"
+//        mapView.setTileSource(
+//            XYTileSource(
+//                "OSMPublicTransport", 6, 20, 256, ".png",
+//                arrayOf("https://map.todus.cu/styles/osm-bright/"), "© OpenStreetMap contributors")
+//        )
+
+        val view = inflater.inflate(R.layout.fragment_map, container, false)
         mapView = view.findViewById(R.id._mapView)
 
         mapView.setTileSource(TileSourceFactory.MAPNIK)
+
         mapView.controller.setCenter(GeoPoint(startLatitude, startLongitude, 10.0))
-        mapView.controller.setZoom(6.5)
-        mapView.maxZoomLevel = 20.toDouble()
-        mapView.minZoomLevel = 3.toDouble()
+        mapView.controller.setZoom(startZoom)
+        mapView.maxZoomLevel = 20.0
+        mapView.minZoomLevel = 3.0
         mapView.overlayManager.tilesOverlay.loadingBackgroundColor = Color.TRANSPARENT
         mapView.overlayManager.tilesOverlay.loadingLineColor = Color.TRANSPARENT
         mapView.zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
@@ -178,18 +273,9 @@ class MapFragment : Fragment() {
 
         view.isFocusableInTouchMode = true
         view.requestFocus()
-        view.setOnKeyListener { _, keyCode, _ ->
-            if (keyCode == KeyEvent.KEYCODE_BACK) {
-                /** Exit */
-                replaceFragment(TimeWeatherFragment())
-                return@setOnKeyListener true
-            }
-            false
-        }
 
         layoutStaticLocation.setOnClickListener {
 
-            /** Here return staticLocation */
             returnLocation()
         }
         return view
@@ -224,15 +310,7 @@ class MapFragment : Fragment() {
 
     private fun showFab() {
         try {
-            fabLocation.visibility = View.VISIBLE
-            fabLocation.animate()
-                .setListener(object : AnimatorListenerAdapter() {
-                    override fun onAnimationEnd(animation: Animator?) {
-                        super.onAnimationEnd(animation)
-                        fabLocation.visibility = View.VISIBLE
-                    }
-                })
-                .alpha(100.toFloat()).duration = 300
+            fabLocation.show()
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -240,15 +318,7 @@ class MapFragment : Fragment() {
 
     private fun hideFab() {
         try {
-            fabLocation.animate()
-                .alpha(0.toFloat())
-                .setDuration(300)
-                .setListener(object : AnimatorListenerAdapter() {
-                    override fun onAnimationEnd(animation: Animator?) {
-                        super.onAnimationEnd(animation)
-                        fabLocation.visibility = View.GONE
-                    }
-                })
+            fabLocation.hide()
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -287,20 +357,7 @@ class MapFragment : Fragment() {
 
         context?.let {
 
-            if (ContextCompat.checkSelfPermission(
-                    context!!,
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                Toast.makeText(
-                    context,
-                    context!!.resources.getString(R.string.requiredLocationPermission),
-                    Toast.LENGTH_SHORT
-                ).show()
-                return
-            }
-
-            val mLocationListener = object : LocationListener {
+            mLocationListener = object : LocationListener {
                 override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
                 }
 
@@ -318,44 +375,8 @@ class MapFragment : Fragment() {
                         }
                     }
                     _mapView?.let {
-                        lastLocation = location
-                        val point =
-                            GeoPoint(location.latitude, location.longitude, location.altitude)
 
-                        if (mMarker == null) {
-                            mMarker = Marker(_mapView)
-                            mMarker!!.setInfoWindow(null)
-                            context?.let {
-                                mMarker!!.icon =
-                                    ContextCompat.getDrawable(context!!, R.drawable.ic_my_position)
-                            }
-                            mMarker!!.position = point
-                            mMarker!!.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
-                        } else {
-                            mapView.overlays.remove(mMarker)
-                            mMarker!!.position = point
-                        }
-                        mMarker!!.setOnMarkerClickListener { _, _ ->
-                            centerMap(location)
-                            hideFab()
-                            false
-                        }
-
-                        if (accuracyOverlay != null) {
-                            mapView.overlays.remove(accuracyOverlay)
-                        } else {
-                            val typedValue = TypedValue()
-                            val theme = context!!.theme
-                            theme.resolveAttribute(R.attr.accuracyColor, typedValue, true)
-                            accuracyColor = typedValue.data
-                        }
-                        accuracyOverlay = AccuracyOverlay(
-                            point, location.accuracy, accuracyColor
-                        )
-                        mapView.overlays.add(accuracyOverlay)
-
-                        mapView.overlays.add(mMarker)
-                        mapView.invalidate()
+                        paintMarker(location)
 
                         if (autoCenter) {
                             centerMap(location)
@@ -366,74 +387,127 @@ class MapFragment : Fragment() {
                 }
             }
 
-            val locationManager =
+            locationManager =
                 context?.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        }
+    }
+
+    private fun startLocationListener() {
+
+        if (ContextCompat.checkSelfPermission(
+                context!!,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            Toast.makeText(
+                context,
+                context!!.resources.getString(R.string.requiredLocationPermission),
+                Toast.LENGTH_SHORT
+            ).show()
+            return
+        }
+
+        try {
             locationManager.requestLocationUpdates(
                 LocationManager.NETWORK_PROVIDER,
                 1000,
                 2f,
                 mLocationListener
             )
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        try {
             locationManager.requestLocationUpdates(
                 LocationManager.GPS_PROVIDER,
                 500,
                 2f,
                 mLocationListener
             )
-        }
-    }
-
-    /** Weather API */
-    private fun replaceFragment(fragment: Fragment) {
-        clearFullScreen()
-        try {
-            parentFragmentManager
-                .beginTransaction()
-                .replace(R.id.layout_main, fragment)
-                .commit()
-        } catch (e: java.lang.Exception) {
+        } catch (e: Exception) {
             e.printStackTrace()
         }
     }
 
-    private fun returnLocation() {
-        context?.let {
+    private fun stopLocationListener() {
+        locationManager.removeUpdates(mLocationListener)
+    }
 
-            val url =
-                "/data/2.5/weather?APPID=aaff1a7a058627a71698a204d3fa78b7&units=metric&lang=" + Locale.getDefault().language
-            val tempUrl =
-                url + ("&lat=" + mapView.mapCenter.latitude + "&lon=" + mapView.mapCenter.longitude)
+    private fun paintMarker(location: Location) {
+        lastLocation = location
+        val point =
+            GeoPoint(location.latitude, location.longitude, location.altitude)
 
-            val execute = @SuppressLint("StaticFieldLeak")
-
-            object : AsyncTask<Void, Void, Void?>() {
-                override fun doInBackground(vararg voids: Void?): Void? {
-
-                    val response: TimeWeather
-                    try {
-                        response =
-                            APIService.apiServiceWather.getTimeWeather(tempUrl).execute().body()!!
-                        response.id = 1
-                        response.coord.lat = mapView.mapCenter.latitude
-                        response.coord.lon = mapView.mapCenter.longitude
-                        context?.let {
-                            AppDataBase.getInstance(context!!).dao().insertTimeWeather(response)
-                        }
-
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
-
-                    return null
-                }
-
-                override fun onPostExecute(result: Void?) {
-                    super.onPostExecute(result)
-                    /** Exit */
-                    replaceFragment(TimeWeatherFragment())
-                }
+        if (mMarker == null) {
+            mMarker = Marker(_mapView)
+            mMarker!!.setInfoWindow(null)
+            context?.let {
+                mMarker!!.icon =
+                    ContextCompat.getDrawable(context!!, R.drawable.ic_my_position)
             }
-            execute.execute()
+            mMarker!!.position = point
+            mMarker!!.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
+        } else {
+            mapView.overlays.remove(mMarker)
+            mMarker!!.position = point
         }
+        mMarker!!.setOnMarkerClickListener { _, _ ->
+            centerMap(location)
+            hideFab()
+            false
+        }
+
+        if (accuracyOverlay != null) {
+            mapView.overlays.remove(accuracyOverlay)
+        } else {
+            val typedValue = TypedValue()
+            val theme = context!!.theme
+            theme.resolveAttribute(R.attr.accuracyColor, typedValue, true)
+            accuracyColor = typedValue.data
+        }
+        accuracyOverlay = AccuracyOverlay(
+            point, location.accuracy, accuracyColor
+        )
+        mapView.overlays.add(accuracyOverlay)
+
+        mapView.overlays.add(mMarker)
+        mapView.invalidate()
+    }
+
+    private fun paintMarkerFriend(point: GeoPoint) {
+
+        val mMarker = Marker(_mapView)
+        mMarker.setInfoWindow(null)
+        context?.let {
+            mMarker.icon =
+                ContextCompat.getDrawable(context!!, R.drawable.ic_location)
+        }
+        mMarker.position = point
+        mMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
+
+        mapView.overlays.add(mMarker)
+        mapView.invalidate()
+    }
+
+    private fun exit() {
+        clearFullScreen()
+        pop()
+    }
+
+    private fun returnLocation() {
+
+        _mapView?.let {
+            val bundle = Bundle()
+            bundle.putDouble(LATITUDE, _mapView.mapCenter.latitude)
+            bundle.putDouble(LONGITUDE, _mapView.mapCenter.longitude)
+            bundle.putDouble(ZOOM, _mapView.zoomLevelDouble)
+            setFragmentResult(ISupportFragment.RESULT_OK, bundle)
+        }
+        exit()
+    }
+
+    override fun onBackPressedSupport(): Boolean {
+        clearFullScreen()
+        return super.onBackPressedSupport()
     }
 }

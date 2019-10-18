@@ -44,6 +44,10 @@ dependencies {
     androidTestImplementation 'androidx.test:runner:1.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
+    /** Fragmentation */
+    implementation 'me.yokeyword:fragmentationx:1.0.1'
+    implementation 'me.yokeyword:fragmentationx-swipeback:1.0.1'
+
     /** Maps */
     implementation 'org.osmdroid:osmdroid-android:6.1.2'
     implementation "androidx.preference:preference:1.1.0"
@@ -52,7 +56,7 @@ dependencies {
     implementation 'com.android.support:multidex:1.0.3'
 
     /** Dark theme */
-    implementation 'com.google.android.material:material:1.1.0-alpha10'
+    implementation 'com.google.android.material:material:1.1.0-beta01'
 
     /** ViewModel and LiveData */
     implementation 'androidx.core:core-ktx:1.1.0'

@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit
 
 object RetrofitClient {
 
-    var retrofit: Retrofit? = null
+    private var retrofit: Retrofit? = null
 
     fun get(baseUrl: String): Retrofit? {
         if (retrofit == null) {

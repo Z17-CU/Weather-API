@@ -5,8 +5,9 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.location.LocationManager
 import android.widget.Toast
-import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
+import com.richdevelop.weather_api.R
 import com.richdevelop.weather_api.locationListener.LocationListener
 import com.richdevelop.weather_api.repository.room.Dao
 import com.richdevelop.weather_api.repository.room.entitys.TimeWeather
@@ -38,19 +39,24 @@ class TimeWeatherRepository @Inject constructor(
 
         val locationListener = LocationListener(dao)
 
-        if (ActivityCompat.checkSelfPermission(
+        if (ContextCompat.checkSelfPermission(
                 context,
                 Manifest.permission.ACCESS_FINE_LOCATION
-            ) !== PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                context,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            ) !== PackageManager.PERMISSION_GRANTED
+            ) != PackageManager.PERMISSION_GRANTED
         ) {
-            Toast.makeText(context, "Location permission fail", Toast.LENGTH_LONG).show()
+            Toast.makeText(
+                context,
+                context.resources.getString(R.string.requiredLocationPermission),
+                Toast.LENGTH_SHORT
+            ).show()
             return
         }
-        locationManager.requestLocationUpdates(
-            LocationManager.NETWORK_PROVIDER, 60000 * 15, 0f, locationListener
-        )
+        try {
+            locationManager.requestLocationUpdates(
+                LocationManager.NETWORK_PROVIDER, 60000 * 15, 0f, locationListener
+            )
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 }

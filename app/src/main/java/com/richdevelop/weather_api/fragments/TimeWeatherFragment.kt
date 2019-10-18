@@ -9,7 +9,6 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.bumptech.glide.Glide
@@ -24,10 +23,11 @@ import com.richdevelop.weather_api.utils.Const.Companion.IMAGE_URL_END
 import com.richdevelop.weather_api.viewModel.TimeWeatherViewModel
 import com.richdevelop.weather_api.viewModel.TimeWeatherViewModelFactory
 import kotlinx.android.synthetic.main.fragment_main.*
+import me.yokeyword.fragmentation.SupportFragment
 import java.util.*
 
 
-class TimeWeatherFragment : Fragment() {
+class TimeWeatherFragment : SupportFragment() {
 
     private lateinit var viewModel: TimeWeatherViewModel
 
@@ -70,7 +70,7 @@ class TimeWeatherFragment : Fragment() {
         return view
     }
 
-    @SuppressLint("SetTextI18n")
+    @SuppressLint("SetTextI18n", "DefaultLocale")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -140,7 +140,7 @@ class TimeWeatherFragment : Fragment() {
 
     private fun onClicks() {
         _locationImageView.setOnClickListener {
-            replaceFragment(MapFragment())
+            start(MapFragment())
         }
 
         _refreshImageView.setOnClickListener {
@@ -150,13 +150,6 @@ class TimeWeatherFragment : Fragment() {
                 updateData()
             }
         }
-    }
-
-    private fun replaceFragment(fragment: Fragment) {
-        parentFragmentManager
-            .beginTransaction()
-            .replace(R.id.layout_main, fragment)
-            .commit()
     }
 
     private fun updateData() {

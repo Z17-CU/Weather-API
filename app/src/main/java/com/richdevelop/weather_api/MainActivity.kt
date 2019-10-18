@@ -4,30 +4,40 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.Fragment
 import com.richdevelop.weather_api.fragments.TimeWeatherFragment
+import me.yokeyword.fragmentation.Fragmentation
+import me.yokeyword.fragmentation.SupportActivity
 import java.util.*
 import kotlin.collections.ArrayList
 
-class MainActivity : AppCompatActivity() {
 
-    private val REQUIRED_SDK_PERMISSIONS =
-        arrayOf(
-            Manifest.permission.ACCESS_COARSE_LOCATION,
-            Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.INTERNET,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE,
-            Manifest.permission.ACCESS_NETWORK_STATE
-        )
-    private val REQUEST_CODE_ASK_PERMISSIONS = 1234
+class MainActivity : SupportActivity() {
+
+    companion object {
+        private val REQUIRED_SDK_PERMISSIONS =
+            arrayOf(
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.INTERNET,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.ACCESS_NETWORK_STATE
+            )
+        private const val REQUEST_CODE_ASK_PERMISSIONS = 1234
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        window.setBackgroundDrawable(resources.getDrawable(R.drawable.yellow_bg))
+        window.setBackgroundDrawable(ContextCompat.getDrawable(this, R.drawable.yellow_bg))
         setContentView(R.layout.layout_main)
+
+
+        Fragmentation.builder()
+            // show stack view. Mode: BUBBLE, SHAKE, NONE
+            .stackViewMode(Fragmentation.BUBBLE)
+            .debug(BuildConfig.DEBUG)
+            .install()
 
         checkPermissions()
     }
@@ -50,14 +60,14 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
                 // all permissions were granted
-                start()
+                val top = topFragment
+                if (top == null) {
+                    loadRootFragment(
+                        R.id.layout_main, TimeWeatherFragment()
+                    )  //load root Fragment
+                }
             }
         }
-    }
-
-    private fun start() {
-        val timeWeatherFragment = TimeWeatherFragment()
-        replaceFragment(timeWeatherFragment)
     }
 
     private fun checkPermissions() {
@@ -82,12 +92,5 @@ class MainActivity : AppCompatActivity() {
                 grantResults
             )
         }
-    }
-
-    private fun replaceFragment(fragment: Fragment) {
-        supportFragmentManager
-            .beginTransaction()
-            .replace(R.id.layout_main, fragment)
-            .commit()
     }
 }
