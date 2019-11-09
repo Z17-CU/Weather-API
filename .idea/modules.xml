@@ -2,6 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/AndroidStudioProjects-Weather-API.iml" filepath="$PROJECT_DIR$/AndroidStudioProjects-Weather-API.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/AndroidStudioProjects-Weather-API-app.iml" filepath="$PROJECT_DIR$/app/AndroidStudioProjects-Weather-API-app.iml" />
       <module fileurl="file://$PROJECT_DIR$/Weather-API.iml" filepath="$PROJECT_DIR$/Weather-API.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/Weather-API-app.iml" filepath="$PROJECT_DIR$/app/Weather-API-app.iml" />
       <module fileurl="file://$PROJECT_DIR$/Work Space-Weather-API.iml" filepath="$PROJECT_DIR$/Work Space-Weather-API.iml" />

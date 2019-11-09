@@ -187,11 +187,11 @@ class MapFragment : SupportFragment() {
         Configuration.getInstance().isDebugMode = true
 
         /** Custom tiles with authentication*/
-        //Configuration.getInstance().additionalHttpRequestProperties["Authorization"] = "Bearer ${ToDusAuth.getInstance().currentOwner?.owner?.credential?.token}"
+        //Configuration.getInstance().additionalHttpRequestProperties["Authorization"] = "Bearer ${token}"
 //        mapView.setTileSource(
 //            XYTileSource(
 //                "OSMPublicTransport", 6, 20, 256, ".png",
-//                arrayOf("https://map.todus.cu/styles/osm-bright/"), "© OpenStreetMap contributors")
+//                arrayOf("URL"), "© OpenStreetMap contributors")
 //        )
 
         val view = inflater.inflate(R.layout.fragment_map, container, false)

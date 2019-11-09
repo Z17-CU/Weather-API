@@ -1,16 +1,18 @@
 <resources>
-    <string name="app_name">Weather-API</string>
+    <string name="app_name">Tiempo</string>
     <string name="high">Alta</string>
     <string name="low">Baja</string>
     <string name="gradosF">°F</string>
     <string name="gradosC">°C</string>
     <string name="grados">°</string>
 
-    <string name="enviar_la_ubicaci_n_seleccionada">Enviar la ubicación seleccionada</string>
+    <string name="enviar_la_ubicaci_n_seleccionada">Consultar en la ubicación seleccionada</string>
     <string name="loading">Esperando ubicación…</string>
     <string name="requiredLocationPermission">Permiso de ubicación no concedido</string>
     <string name="requiredStoragePermission">Permiso de almacenamiento no concedido</string>
     <string name="currentLocation">Ubicación actual.</string>
     <string name="exact">Exacto a</string>
     <string name="meters">m</string>
+
+    <string name="permissions">Debe conceder los permisos para continuar</string>
 </resources>

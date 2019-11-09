@@ -14,7 +14,4 @@ interface Dao {
 
     @Query("SELECT * FROM ${TimeWeather.TABLE_NAME}")
     fun getTimeWeather(): LiveData<TimeWeather?>
-
-    @Query("SELECT * FROM ${TimeWeather.TABLE_NAME} WHERE dt < :timeOut")
-    fun hasTimeWeather(timeOut: Long): Boolean
 }

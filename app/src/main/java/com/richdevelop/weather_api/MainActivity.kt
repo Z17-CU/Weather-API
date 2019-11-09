@@ -32,7 +32,6 @@ class MainActivity : SupportActivity() {
         window.setBackgroundDrawable(ContextCompat.getDrawable(this, R.drawable.yellow_bg))
         setContentView(R.layout.layout_main)
 
-
         Fragmentation.builder()
             // show stack view. Mode: BUBBLE, SHAKE, NONE
             .stackViewMode(Fragmentation.BUBBLE)
@@ -52,8 +51,7 @@ class MainActivity : SupportActivity() {
                     if (grantResults[index] != PackageManager.PERMISSION_GRANTED) {
                         // exit the app if one permission is not granted
                         Toast.makeText(
-                            this, "Required permission '" + permissions[index]
-                                    + "' not granted, exiting", Toast.LENGTH_LONG
+                            this, resources.getString(R.string.permissions), Toast.LENGTH_LONG
                         ).show()
                         finish()
                         return

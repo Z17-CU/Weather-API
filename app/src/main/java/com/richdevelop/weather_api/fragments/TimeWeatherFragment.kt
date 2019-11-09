@@ -209,8 +209,7 @@ class TimeWeatherFragment : SupportFragment() {
     private fun updateData() {
         val url =
             "/data/2.5/weather?APPID=aaff1a7a058627a71698a204d3fa78b7&units=metric&lang=" + Locale.getDefault().language
-        val tempUrl =
-            url + ("&lat=" + lastLatitude + "&lon=" + lastLongitude)
+        val tempUrl = "$url&lat=$lastLatitude&lon=$lastLongitude"
 
         val execute = @SuppressLint("StaticFieldLeak")
 
